@@ -26,7 +26,8 @@ export async function darkreadHandler(
     const cached = getCached(url);
     const darkreadUrl = cached ?? (await getDarkreadUrl(url));
     if (!cached) setCached(url, darkreadUrl);
-    sendResult(res, darkreadUrl);
+    const useCors = req.query.cors === 'true';
+    sendResult(res, darkreadUrl, useCors);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(message);
@@ -48,10 +49,11 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-function sendResult(res: Response, darkreadUrl: string): void {
+function sendResult(res: Response, darkreadUrl: string, useCors: boolean): void {
   if (process.env.NODE_ENV === 'production') {
-    res.redirect(HttpStatus.Found, darkreadUrl);
+    const target = useCors ? `/proxy/${darkreadUrl}` : darkreadUrl;
+    res.redirect(HttpStatus.Found, target);
   } else {
-    res.json({ url: darkreadUrl });
+    res.json({ url: darkreadUrl, corsUrl: `/proxy/${darkreadUrl}` });
   }
 }

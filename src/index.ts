@@ -5,6 +5,7 @@ import { BASE_URL, ONE_MINUTE_MS, PORT } from './config';
 import { darkreadHandler } from './routes/darkread';
 import { healthHandler } from './routes/health';
 import { homeHandler } from './routes/home';
+import { proxyHandler } from './routes/proxy';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(rateLimit({ windowMs: ONE_MINUTE_MS, limit: 30 }));
 app.get('/', homeHandler);
 app.get('/darkread', darkreadHandler);
 app.get('/health', healthHandler);
+app.use('/proxy', proxyHandler);
 
 export default app;
 

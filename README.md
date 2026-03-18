@@ -14,14 +14,15 @@ GET http://localhost:3000/darkread?url=https://exemplo.com/artigo
 → { "url": "https://www.darkread.io/ox_dmKRxYtR0" }
 ```
 
-Em produção (`NODE_ENV=production`), o endpoint faz redirect 302 direto para a URL do darkread em vez de retornar JSON.
+Em produção (`NODE_ENV=production`), o endpoint faz redirect 302. Com `cors=true`, o redirect aponta para o proxy CORS interno que serve o conteúdo com `Access-Control-Allow-Origin: *`.
 
 ## Rotas
 
 | Rota | Descrição |
 |---|---|
-| `GET /` | Página inicial com instruções de uso |
+| `GET /` | Redireciona para `/darkread` repassando a query string |
 | `GET /darkread?url=<url>` | Converte uma URL para o link darkread correspondente |
+| `GET /proxy/<url>` | Proxy CORS — serve qualquer URL com `Access-Control-Allow-Origin: *` |
 | `GET /health` | Health check |
 
 ### `GET /darkread`
@@ -31,16 +32,27 @@ Em produção (`NODE_ENV=production`), o endpoint faz redirect 302 direto para a
 | Parâmetro | Obrigatório | Descrição |
 |---|---|---|
 | `url` | sim | URL do artigo (`http` ou `https`) |
+| `cors` | não | `true` para retornar o conteúdo via proxy CORS |
 
 **Respostas:**
 
 | Status | Descrição |
 |---|---|
-| `200` | `{ "url": "https://www.darkread.io/..." }` (dev) |
-| `302` | Redirect para a URL do darkread (produção) |
+| `200` | `{ "url": "...", "corsUrl": "/proxy/..." }` (dev) |
+| `302` | Redirect para a URL do darkread (produção, sem `cors=true`) |
+| `302` | Redirect para `/proxy/<darkreadUrl>` (produção, com `cors=true`) |
 | `400` | URL ausente, inválida ou com protocolo não permitido |
 | `429` | Rate limit excedido (30 req/min por IP) |
 | `502` | Falha na comunicação com o darkread.io |
+
+### `GET /proxy/<url>`
+
+Proxy baseado em [cors-anywhere](https://www.npmjs.com/package/cors-anywhere). Busca a URL alvo e devolve o conteúdo com o header `Access-Control-Allow-Origin: *`, permitindo consumo direto pelo browser.
+
+```
+GET /proxy/https://www.darkread.io/abc123
+→ conteúdo da página com Access-Control-Allow-Origin: *
+```
 
 ## Como funciona
 

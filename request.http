@@ -7,3 +7,9 @@ GET http://localhost:3000/
 
 GET https://darkread-proxy.vercel.app/
   ?url=https://www.lipsum.com/
+
+###
+
+GET https://darkread-proxy.vercel.app/
+  ?cors=true
+  &url=https://www.lipsum.com/
