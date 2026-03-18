@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { ONE_MINUTE_MS } from './config';
 
 const CACHE_TTL_MS = 30 * ONE_MINUTE_MS;

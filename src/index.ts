@@ -1,10 +1,10 @@
 import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import { BASE_URL, ONE_MINUTE_MS, PORT } from './config.js';
-import { darkreadHandler } from './routes/darkread.js';
-import { healthHandler } from './routes/health.js';
-import { homeHandler } from './routes/home.js';
+import { BASE_URL, ONE_MINUTE_MS, PORT } from './config';
+import { darkreadHandler } from './routes/darkread';
+import { healthHandler } from './routes/health';
+import { homeHandler } from './routes/home';
 
 const app = express();
 

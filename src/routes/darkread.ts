@@ -1,8 +1,8 @@
 import { URL } from 'node:url';
 import { Request, Response } from 'express';
-import { getDarkreadUrl } from '../darkread.js';
-import { HttpStatus } from '../http-status.js';
-import { getCached, setCached } from '../url-cache.js';
+import { getDarkreadUrl } from '../darkread';
+import { HttpStatus } from '../http-status';
+import { getCached, setCached } from '../url-cache';
 
 export async function darkreadHandler(
   req: Request,

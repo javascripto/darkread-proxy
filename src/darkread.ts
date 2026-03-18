@@ -1,7 +1,6 @@
 import FormData from 'form-data';
-import fetch from 'node-fetch';
-import { fetchNextActionHash, invalidateCache } from './hash.js';
-import { ONE_SECOND_MS } from './config.js';
+import { fetchNextActionHash, invalidateCache } from './hash';
+import { ONE_SECOND_MS } from './config';
 
 const DARKREAD_URL = 'https://www.darkread.io';
 const FETCH_TIMEOUT_MS = 10 * ONE_SECOND_MS;
@@ -20,7 +19,11 @@ export async function getDarkreadUrl(articleUrl: string): Promise<string> {
   form.append('1_url', articleUrl);
   form.append('0', JSON.stringify([{ url: '', error: '' }, '$K1']));
 
-  const body = form.getBuffer();
+  const bodyBuffer = form.getBuffer();
+  const body = bodyBuffer.buffer.slice(
+    bodyBuffer.byteOffset,
+    bodyBuffer.byteOffset + bodyBuffer.byteLength,
+  ) as ArrayBuffer;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -32,7 +35,7 @@ export async function getDarkreadUrl(articleUrl: string): Promise<string> {
       method: 'POST',
       headers: {
         ...form.getHeaders(),
-        'content-length': String(body.length),
+        'content-length': String(bodyBuffer.byteLength),
         'next-action': hash,
         'next-router-state-tree': ROUTER_STATE,
         accept: 'text/x-component',
