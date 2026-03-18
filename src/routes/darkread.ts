@@ -27,7 +27,7 @@ export async function darkreadHandler(
     const darkreadUrl = cached ?? (await getDarkreadUrl(url));
     if (!cached) setCached(url, darkreadUrl);
     const useCors = req.query.cors === 'true';
-    sendResult(res, darkreadUrl, useCors);
+    await sendResult(res, darkreadUrl, useCors);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(message);
@@ -49,11 +49,19 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-function sendResult(res: Response, darkreadUrl: string, useCors: boolean): void {
+async function sendResult(res: Response, darkreadUrl: string, useCors: boolean): Promise<void> {
+  if (useCors) {
+    const upstream = await fetch(darkreadUrl);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', upstream.headers.get('content-type') ?? 'text/html');
+    const body = await upstream.arrayBuffer();
+    res.send(Buffer.from(body));
+    return;
+  }
+
   if (process.env.NODE_ENV === 'production') {
-    const target = useCors ? `/proxy/${darkreadUrl}` : darkreadUrl;
-    res.redirect(HttpStatus.Found, target);
+    res.redirect(HttpStatus.Found, darkreadUrl);
   } else {
-    res.json({ url: darkreadUrl, corsUrl: `/proxy/${darkreadUrl}` });
+    res.json({ url: darkreadUrl });
   }
 }

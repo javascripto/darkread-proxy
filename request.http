@@ -1,7 +1,13 @@
-### Darkread Proxy API
+###
 
 GET http://localhost:3000/
   ?url=https://www.lipsum.com/
+
+###
+
+GET http://localhost:3000/
+  ?cors=true
+  &url=https://www.lipsum.com/
 
 ###
 
